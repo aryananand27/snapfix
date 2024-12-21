@@ -20,7 +20,9 @@ async function Dbconnect(){
     if(!DB){
         throw new Error("Please Provide Connection Url.");
     }
-    cached.promise= cached.promise || mongoose.connect(DB);
+    cached.promise= cached.promise || mongoose.connect(DB,{ 
+        dbName: 'snapfix'
+      });
     cached.conn=await cached.promise;
     return cached.conn;
 }
