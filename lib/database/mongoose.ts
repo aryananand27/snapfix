@@ -1,29 +1,31 @@
-import mongoose,{Mongoose} from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
-const DB=process.env.MONGODB_URL;
+const DB = process.env.MONGODB_URL;
 
-interface MongooseConnection{
-    conn:Mongoose|null,
-    promise:Promise<Mongoose> | null
+if (!DB) {
+  throw new Error("Please provide a MongoDB connection URL.");
 }
 
-let cached :MongooseConnection = (global as any).mongoose;
+// Initialize the global mongoose connection cache
+global.mongoose = global.mongoose || { conn: null, promise: null };
 
-if(!cached){
-    cached=(global as any).mongoose={conn:null,promise:null}
-}
+async function Dbconnect(): Promise<Mongoose> {
+  if (global.mongoose.conn) {
+    return global.mongoose.conn;
+  }
 
-async function Dbconnect(){
-    if (cached.conn) {
-        return cached.conn;
-      }
-    if(!DB){
-        throw new Error("Please Provide Connection Url.");
+  if (!global.mongoose.promise) {
+    if (!DB) {
+      throw new Error("MONGODB_URL is not defined.");
     }
-    cached.promise= cached.promise || mongoose.connect(DB,{ 
-        dbName: 'snapfix'
-      });
-    cached.conn=await cached.promise;
-    return cached.conn;
+
+    global.mongoose.promise = mongoose.connect(DB, {
+      dbName: "snapfix",
+    });
+  }
+
+  global.mongoose.conn = await global.mongoose.promise;
+  return global.mongoose.conn;
 }
+
 export default Dbconnect;
