@@ -18,7 +18,6 @@ const UserSchema = new Schema({
   },
   photo: {
     type: String,
-    required: true,
   },
   firstName: {
     type: String,
@@ -36,6 +35,6 @@ const UserSchema = new Schema({
   },
 });
 
-const User = models?.User || model("users", UserSchema);
+const User = models.User || model("User", UserSchema);
 
 export default User;

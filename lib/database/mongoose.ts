@@ -1,6 +1,10 @@
 import mongoose, { Mongoose } from "mongoose";
+import dotenv from "dotenv";
 
-const DB = process.env.MONGODB_URL;
+// Load environment variables
+dotenv.config();
+
+const DB: string = process.env.MONGODB_URL as string;
 
 if (!DB) {
   throw new Error("Please provide a MongoDB connection URL.");
@@ -15,17 +19,30 @@ async function Dbconnect(): Promise<Mongoose> {
   }
 
   if (!global.mongoose.promise) {
-    if (!DB) {
-      throw new Error("MONGODB_URL is not defined.");
+    try {
+      global.mongoose.promise = mongoose.connect(DB);
+    } catch (err) {
+      console.error("Error connecting to MongoDB:", err);
+      throw err;
     }
-
-    global.mongoose.promise = mongoose.connect(DB, {
-      dbName: "snapfix",
-    });
   }
 
   global.mongoose.conn = await global.mongoose.promise;
+
+  if (global.mongoose.conn) {
+    console.log("MongoDB connection established successfully.");
+  }
   return global.mongoose.conn;
 }
 
+// Export the function
 export default Dbconnect;
+
+// Example usage
+(async () => {
+  try {
+    await Dbconnect();
+  } catch (err) {
+    console.error("Database connection failed:", err);
+  }
+})();

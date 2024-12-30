@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 export async function createUser(user: CreateUserParams) {
     try {
       await Dbconnect();
+    
+     
   
       const newUser = await User.create(user);
   
@@ -15,6 +17,7 @@ export async function createUser(user: CreateUserParams) {
       handleError(error);
     }
   }
+  
   
   // READ
   export async function getUserById(userId: string) {
